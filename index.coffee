@@ -65,31 +65,6 @@ afterLocalAuth = (req, res ,next) ->
   else
     next()
 
-socialAuth = (provider) ->
-  (req, res, next) ->
-    return next("#{provider} denied") if req.query.denied
-    artsyXappToken = res.locals.artsyXappToken if res.locals.artsyXappToken
-    passport.authenticate(provider,
-      callbackURL: "#{opts.APP_URL}#{opts[provider + 'CallbackPath']}?#{qs.stringify req.query}"
-      scope: 'email'
-    )(req, res, next)
-
-# We have to hack around passport by capturing a custom error message that indicates we've
-# created a user in one of passport's social callbacks. If we catch that error then we'll
-# attempt to redirect back to login and strip out the expired Facebook/Twitter credentials.
-socialSignup = (provider) ->
-  (err, req, res, next) ->
-    return next(err) unless err.message is 'artsy-passport: created user from social'
-
-    # Redirect to a social login url stripping out the Facebook/Twitter credentials
-    # (code, oauth_token, etc). This will be seemless for Facebook, but since Twitter has a
-    # ask for permision UI it will mean asking permission twice. It's not apparent yet why
-    # we can't re-use the credentials... without stripping them we get errors from FB & Twitter.
-    querystring = qs.stringify _.omit(req.query, 'code', 'oauth_token', 'oauth_verifier')
-    url = (if provider is 'twitter' then opts.twitterLastStepPath else opts.facebookPath) +
-          '?' + querystring
-    res.redirect url
-
 signup = (req, res, next) ->
   request.put(opts.SECURE_ARTSY_URL + '/v2/accounts/invitation').send(
     name: req.body.name
