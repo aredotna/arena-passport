@@ -1,18 +1,13 @@
 {
-    "name": "artsy-passport",
+    "name": "arena-passport",
     "version": "0.1.4",
-    "description": "Wires up the common auth handlers for Artsy's [Ezel](ezeljs.com)-based apps using [passport](http://passportjs.org/).",
+    "description": "Wires up the common auth handlers for Arena login using Artsy's [Ezel](ezeljs.com)-based apps using [passport](http://passportjs.org/). Forked from Artsy Passport",
     "keywords": [
         "artsy",
         "passport",
         "auth",
         "authentication"
     ],
-    "author": {
-        "name": "Craig Spaeth",
-        "email": "craigspaeth@gmail.com",
-        "url": "http://craigspaeth.com"
-    },
     "engines": {
         "node": ">= 0.10.x"
     },
