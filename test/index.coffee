@@ -13,11 +13,11 @@ describe 'Artsy Passport integration', ->
   it 'can log in with email and password', (done) ->
     Browser.visit 'http://localhost:5000', (e, browser) ->
       browser
-        .fill('email', ARTSY_EMAIL)
-        .fill('password', ARTSY_PASSWORD)
+        .fill('email', ARENA_EMAIL)
+        .fill('password', ARENA_PASSWORD)
         .pressButton "Login", ->
           browser.html().should.include '<h1>Hello'
-          browser.html().should.include ARTSY_EMAIL
+          browser.html().should.include ARENA_EMAIL
           done()
 
 describe 'Artsy Passport methods', ->
