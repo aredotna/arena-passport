@@ -1,7 +1,7 @@
 BIN = node_modules/.bin
 
 test: compile
-	$(BIN)/mocha
+	$(BIN)/mocha --compilers coffee:coffee-script/register
 
 cli:
 	node test/cli.js

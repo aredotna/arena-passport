@@ -5,7 +5,7 @@ app = require '../example'
 sinon = require 'sinon'
 { ARENA_EMAIL, ARENA_PASSWORD } = require '../config'
 
-describe 'Artsy Passport integration', ->
+describe 'Arena Passport integration', ->
 
   before (done) ->
     app.listen 5000, done
@@ -20,15 +20,15 @@ describe 'Artsy Passport integration', ->
           browser.html().should.include ARENA_EMAIL
           done()
 
-describe 'Artsy Passport methods', ->
+describe 'Arena Passport methods', ->
 
   before ->
-    @artsyPassport = rewire '../index.coffee'
+    @arenaPassport = rewire '../index.coffee'
 
   describe '#serializeUser', ->
 
     before ->
-      @serializeUser = @artsyPassport.__get__ 'serializeUser'
+      @serializeUser = @arenaPassport.__get__ 'serializeUser'
 
     it 'only stores select data in the session', (done) ->
       model = new Backbone.Model({ id: 'craig', foo: 'baz', bam: 'bop' })
@@ -41,10 +41,10 @@ describe 'Artsy Passport methods', ->
   describe '#afterLocalAuth', ->
 
     beforeEach ->
-      opts = @artsyPassport.__get__ 'opts'
-      @afterLocalAuth = @artsyPassport.__get__ 'afterLocalAuth'
+      opts = @arenaPassport.__get__ 'opts'
+      @afterLocalAuth = @arenaPassport.__get__ 'afterLocalAuth'
       @req = { query: {}, user: { get: -> 'access-foo-token' } }
-      @res = { send: sinon.stub() }
+      @res = { send: sinon.stub(), body: {nothing: 'something', toJSON: -> }}
       @next = sinon.stub()
 
     it 'throws a 403 if there is an auth error', ->
@@ -53,6 +53,7 @@ describe 'Artsy Passport methods', ->
       @res.send.args[0][0].should.equal 403
 
     it 'returns json success for ajax calls', ->
+      @req.xhr = true
       @req.accepts = -> true
       @req.user = { toJSON: -> }
       @afterLocalAuth @req, @res
@@ -61,9 +62,9 @@ describe 'Artsy Passport methods', ->
   describe '#headerLogin', ->
 
     beforeEach ->
-      opts = @artsyPassport.__get__ 'opts'
+      opts = @arenaPassport.__get__ 'opts'
       opts.CurrentUser = Backbone.Model
-      @headerLogin = @artsyPassport.__get__ 'headerLogin'
+      @headerLogin = @arenaPassport.__get__ 'headerLogin'
       @req = { query: {}, get: (-> 'access-foo-token'), login: sinon.stub() }
       @res = { send: sinon.stub() }
       @next = sinon.stub()

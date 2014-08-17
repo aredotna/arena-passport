@@ -1,7 +1,5 @@
 #
-# Uses [passport.js](http://passportjs.org/) to setup authentication with various
-# providers like direct login with Artsy, or oauth signin with Facebook or Twitter.
-#
+# Uses [passport.js](http://passportjs.org/) to setup authentication for Arena
 
 _ = require 'underscore'
 request = require 'superagent'
@@ -19,10 +17,9 @@ artsyXappToken = null
 
 # Default options
 opts =
-  facebookPath: '/users/auth/facebook'
-  twitterPath: '/users/auth/twitter'
-  loginPath: '/users/sign_in'
-  signupPath: '/users/invitation/accept'
+  SECURE_ARENA_URL: 'http://localhost:3000'
+  loginPath: '/me/sign_in'
+  signupPath: '/me/invitation/accept'
   userKeys: ['id', 'first_name', 'last_name', 'email', 'slug', 'following_ids', 'notification_count']
 
 #
@@ -55,18 +52,18 @@ localAuth = (req, res, next) ->
     res.authError = info; next()
   )(req, res, next)
 
-afterLocalAuth = (req, res ,next) ->
+afterLocalAuth = (req, res, next) ->
   if res.authError
     res.send 403, { success: false, error: res.authError }
   else if req.xhr and req.user?
-    res.send { success: true, user: req.user.toJSON() }
+    res.send { success: true, token: res.body.toJSON() }
   else if req.xhr and not req.user?
     res.send { success: false, error: "Missing user." }
   else
     next()
 
 signup = (req, res, next) ->
-  request.put(opts.SECURE_ARTSY_URL + '/v2/accounts/invitation').send(
+  request.put(opts.SECURE_ARENA_URL + '/v2/accounts/invitation').send(
     name: req.body.name
     email: req.body.email
     password: req.body.password
@@ -74,6 +71,7 @@ signup = (req, res, next) ->
   ).end onCreateUser(next)
 
 onCreateUser = (next) ->
+  console.log 'onCreateUser', next
   (err, res) ->
     if res.status isnt 201
       errMsg = res.body.message
@@ -105,26 +103,26 @@ initPassport = ->
 # Passport callbacks
 #
 arenaCallback = (username, password, done) ->
-  request.post("#{opts.SECURE_ARTSY_URL}/v2/token").query(
+  request.post("#{opts.SECURE_ARENA_URL}/v2/tokens").query(
     email: username
     password: password
   ).end accessTokenCallback(done)
 
 accessTokenCallback = (done, params) ->
   return (e, res) ->
-
-    # Catch the various forms of error Artsy could encounter
+    # Catch the various forms of error Arena could encounter
+    console.log('res', res, 'e', e)
     err = null
     try
       err = JSON.parse(res.text).error_description
       err ?= JSON.parse(res.text).error
     err ?= "Arena returned a generic #{res.status}" if res.status > 400
-    err ?= "Arena returned no access token and no error" unless res.body.access_token?
+    err ?= "Arena returned no access token and no error" unless res.body.token?
     err ?= e
 
     # If there are no errors create the user from the access token
     unless err
-      return done(null, new opts.CurrentUser(accessToken: res.body.access_token))
+      return done(null, new opts.CurrentUser(access_token: res.body.token, name: params.email))
 
     # Invalid email or password
     else if err.match?('invalid email or password')
