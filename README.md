@@ -25,7 +25,6 @@ app.use artsyPassport
   loginPath: '/users/sign_in' # POST `email` and `password` to this path to login
   signupPath: '/users/invitation/accept' # POST `email` and `password` to this path to signup
   # The user data to cache in the session
-  userKeys: ['id', 'type', 'name', 'email', 'phone', 'lab_features', 'default_profile_id', 'collector_level']
   CurrentUser: # Backbone Model class to serialize the user into e.g. `CurrentUser`
 ````
 
@@ -79,7 +78,7 @@ app.post signupPath, (req, res) ->
 In your server-side templates
 
 ````jade
-h1 Hello #{user.get('name')}
+h1 Hello #{user.get('username')}
 ````
 
 In your client-side code
