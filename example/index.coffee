@@ -9,10 +9,11 @@ backboneSuperSync = require 'backbone-super-sync'
 
 # CurrentUser class
 class CurrentUser extends Backbone.Model
-  url: -> "#{config.SECURE_ARENA_URL}/v2/accounts"
+  url: -> "http://staging.are.na/v2/accounts"
+
   sync: (method, model, options = {}) ->
     options.data ?= {}
-    options.data.access_token = @get 'accessToken'
+    options.data.auth_token = @get 'access_token'
     super
 
 app = module.exports = express()

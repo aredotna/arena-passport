@@ -17,7 +17,7 @@ artsyXappToken = null
 
 # Default options
 opts =
-  SECURE_ARENA_URL: 'http://localhost:3000'
+  SECURE_ARENA_URL: 'http://staging.are.na'
   loginPath: '/me/sign_in'
   signupPath: '/me/invitation/accept'
   userKeys: ['id', 'first_name', 'last_name', 'email', 'slug', 'following_ids', 'notification_count']
@@ -86,7 +86,7 @@ addLocals = (req, res, next) ->
   next()
 
 headerLogin = (req, res, next) ->
-  if token = req.get('X-Access-Token') or req.query.access_token
+  if token = req.get('X-AUTH-TOKEN') or req.query.access_token
     req.login new opts.CurrentUser(accessToken: token), next
   else
     next()
@@ -111,7 +111,6 @@ arenaCallback = (username, password, done) ->
 accessTokenCallback = (done, params) ->
   return (e, res) ->
     # Catch the various forms of error Arena could encounter
-    console.log('res', res, 'e', e)
     err = null
     try
       err = JSON.parse(res.text).error_description
@@ -122,7 +121,7 @@ accessTokenCallback = (done, params) ->
 
     # If there are no errors create the user from the access token
     unless err
-      return done(null, new opts.CurrentUser(access_token: res.body.token, name: params.email))
+      return done(null, new opts.CurrentUser(access_token: res.body.token))
 
     # Invalid email or password
     else if err.match?('invalid email or password')
