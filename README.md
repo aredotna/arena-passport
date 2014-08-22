@@ -6,16 +6,15 @@ Most definitely forked (read copied wholesale, with tiny modifications) from Art
 
 ## Setup
 
-#### Make sure you first mount session, body parser, and [xapp](https://github.com/artsy/artsy-xapp-middleware) middlware.
+#### Make sure you first mount session, body parser.
 
 ````coffeescript
-app.use require('artsy-xapp-middleware') { #... }
 app.use express.bodyParser()
 app.use express.cookieParser('foobar')
 app.use express.cookieSession()
 ````
 
-#### Then mount Artsy Passport passing a big configuration hash.
+#### Then mount Arena Passport passing a big configuration hash.
 
 _Values indicate defaults._
 

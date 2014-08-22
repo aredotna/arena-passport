@@ -16,6 +16,9 @@ class CurrentUser extends Backbone.Model
     options.data.auth_token = @get 'access_token'
     super
 
+  parse: (response) ->
+    response.user
+
 app = module.exports = express()
 
 # Generic setup

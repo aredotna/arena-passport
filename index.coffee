@@ -20,7 +20,7 @@ opts =
   SECURE_ARENA_URL: 'http://staging.are.na'
   loginPath: '/me/sign_in'
   signupPath: '/me/invitation/accept'
-  userKeys: ['id', 'first_name', 'last_name', 'email', 'slug', 'following_ids', 'notification_count']
+  userKeys: ['id', 'first_name', 'last_name', 'email', 'slug', 'following_ids', 'notification_count', 'username']
 
 #
 # Main function that overrides/injects any options, sets up passport, sets up an app to
