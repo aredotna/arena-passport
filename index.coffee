@@ -10,10 +10,7 @@ qs = require 'querystring'
 crypto = require 'crypto'
 { parse } = require 'url'
 
-# Hoist the XAPP token out of a request and store it at the module level for
-# the passport callbacks to access. (Seems like there should be a better way to access
-# request-level data in the passport callbacks.)
-artsyXappToken = null
+arenaXappToken = null
 
 # Default options
 opts =
@@ -81,8 +78,11 @@ onCreateUser = (next) ->
 
 addLocals = (req, res, next) ->
   if req.user
+    console.log 'req.user', req.user
     res.locals.user = req.user
     res.locals.sd?.CURRENT_USER = req.user.toJSON()
+    res.locals.sd?.XAuthToken = req.user.get('authentication_token')
+    console.log 'res.locals.sd', res.locals.sd
   next()
 
 headerLogin = (req, res, next) ->
