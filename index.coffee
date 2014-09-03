@@ -60,7 +60,7 @@ afterLocalAuth = (req, res, next) ->
     next()
 
 signup = (req, res, next) ->
-  request.put(opts.SECURE_ARENA_URL + '/v2/accounts/invitation').send(
+  request.put(opts.SECURE_ARENA_URL + '/accounts/invitation').send(
     name: req.body.name
     email: req.body.email
     password: req.body.password
@@ -100,7 +100,7 @@ initPassport = ->
 # Passport callbacks
 #
 arenaCallback = (username, password, done) ->
-  request.post("#{opts.SECURE_ARENA_URL}/v2/tokens").query(
+  request.post("#{opts.SECURE_ARENA_URL}/tokens").query(
     email: username
     password: password
   ).end accessTokenCallback(done)
