@@ -14,7 +14,7 @@ arenaXappToken = null
 
 # Default options
 opts =
-  SECURE_ARENA_URL: 'http://api.are.na'
+  SECURE_ARENA_URL: 'https://secure.are.na'
   loginPath: '/me/sign_in'
   signupPath: '/me/invitation/accept'
   userKeys: ['id', 'first_name', 'last_name', 'email', 'slug', 'following_ids', 'notification_count', 'username', 'authentication_token']
@@ -79,12 +79,12 @@ addLocals = (req, res, next) ->
   if req.user
     res.locals.user = req.user
     res.locals.sd?.CURRENT_USER = req.user.toJSON()
-    res.locals.sd?.XAuthToken = req.user.get('authentication_token')
   next()
 
 headerLogin = (req, res, next) ->
+  return next() if req.path is opts.logoutPath
   if token = req.get('X-AUTH-TOKEN') or req.query.access_token
-    req.login new opts.CurrentUser(accessToken: token), next
+    req.login new opts.CurrentUser(access_token: token), next
   else
     next()
 
@@ -94,12 +94,15 @@ headerLogin = (req, res, next) ->
 initPassport = ->
   passport.serializeUser serializeUser
   passport.deserializeUser deserializeUser
-  passport.use new LocalStrategy { usernameField: 'email' }, arenaCallback
+  passport.use new LocalStrategy(
+    { usernameField: 'email', passReqToCallback: true }
+    arenaCallback
+  )
 
 #
 # Passport callbacks
 #
-arenaCallback = (username, password, done) ->
+arenaCallback = (req, username, password, done) ->
   request.post("#{opts.SECURE_ARENA_URL}/tokens").query(
     email: username
     password: password
@@ -134,10 +137,13 @@ accessTokenCallback = (done, params) ->
 #
 serializeUser = (user, done) ->
   user.fetch
+    data:
+      auth_token: user.get('access_token')
     success: ->
-      keys = ['accessToken'].concat opts.userKeys
+      keys = ['access_token'].concat opts.userKeys
       done null, user.pick(keys)
-    error: (m, e) -> done e.text
+    error: (m, e) ->
+      done e.text
 
 deserializeUser = (userData, done) ->
   done null, new opts.CurrentUser(userData)
