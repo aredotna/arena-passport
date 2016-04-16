@@ -1,4 +1,5 @@
 var coffee = require("coffee-script");
+coffee.register();
 var File = require("fs");
 if (!require.extensions[".coffee"]) {
   require.extensions[".coffee"] = function (module, filename) {
