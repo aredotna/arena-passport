@@ -53,7 +53,7 @@ afterLocalAuth = (req, res, next) ->
   if res.authError
     res.send 403, { success: false, error: res.authError }
   else if req.xhr and req.user?
-    res.send { success: true }
+    res.send { success: true, user: req.user }
   else if req.xhr and not req.user?
     res.send { success: false, error: "Missing user." }
   else
