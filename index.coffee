@@ -136,14 +136,17 @@ accessTokenCallback = (done, params) ->
 # Serialize user by fetching and caching user data in the session.
 #
 serializeUser = (user, done) ->
-  user.fetch
-    data:
-      auth_token: user.get('access_token')
-    success: ->
-      keys = ['access_token'].concat opts.userKeys
-      done null, user.pick(keys)
-    error: (m, e) ->
-      done e.text
+  if user.get('access_token') isnt 'undefined'
+    user.fetch
+      data:
+        auth_token: user.get('access_token')
+      success: ->
+        keys = ['access_token'].concat opts.userKeys
+        done null, user.pick(keys)
+      error: (m, e) ->
+        done e.text
+  else
+    done null, user
 
 deserializeUser = (userData, done) ->
   done null, new opts.CurrentUser(userData)
